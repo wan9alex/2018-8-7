@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="msapplication-tap-highlight" content="no" />
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *"
+  />
+
+  <link rel="stylesheet" type="text/css" href="css/index.css" />
+  <title>Hello World</title>
+</head>
+
+<body>
+  <div class="app">
+    <h1>PhoneGap123</h1>
+    <input type="button" value="getCurrentAcceleration" id="btn1">
+    <input type="button" value="watchAcceleration" id="btn2">
+    <input type="button" value="clearWatch" id="btn3">
+    <div id="div1">重力信息</div>
+  </div>
+  <script type="text/javascript" src="cordova.js"></script>
+  <script type="text/javascript">
+    //设备准备好
+    document.addEventListener('deviceready', function () {
+      var btn1 = document.getElementById('btn1');
+      var btn2 = document.getElementById('btn2');
+      var btn3 = document.getElementById('btn3');
+      var div1 = document.getElementById('div1');
+      var watchID=null;
+      
+      var localX=0,localY=0,localZ=0;
+
+      btn1.onclick = function () {
+        navigator.accelerometer.getCurrentAcceleration(
+          function (acc) {
+            div1.innerHTML = acc.x + '/' + acc.y + '/' + acc.z;
+          }, function () {
+            alert('getCurrentAcceleration error!');
+          });
+      }
+      
+     
+
+      btn2.onclick = function () {
+        btn2.style.background='red';
+        watchID = navigator.accelerometer.watchAcceleration(
+          function (acc) {
+
+            div1.innerHTML = acc.x + '/' + acc.y + '/' + acc.z;
+
+            if(
+              Math.abs(acc.x)-Math.abs(localX) > 15 ||
+              Math.abs(acc.y)-Math.abs(localY) > 15 ||
+              Math.abs(acc.z)-Math.abs(localZ) > 15
+            ){
+              navigator.notification.beep(1);
+            }
+
+            localX=acc.x;
+            localY=acc.y;
+            localZ=acc.z;
+            
+
+          }, function () {
+            alert('getCurrentAcceleration error!');
+          },
+          { frequency: 100 }// 每隔3秒更新一次
+        );
+      }
+
+      btn3.onclick = function () {
+        navigator.accelerometer.clearWatch(watchID);
+      }
+
+    }, false);
+  </script>
+</body>
+
+</html>
